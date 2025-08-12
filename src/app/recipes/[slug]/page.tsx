@@ -4,11 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FavoriteButton } from '@/components/FavoriteButton';
-import { db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
+
 
 function unslugify(slug: string) {
     const words = slug.split('-');
@@ -17,26 +14,11 @@ function unslugify(slug: string) {
         .join(' ');
 }
 
-async function getIsFavorite(userId: string | null, recipeSlug: string): Promise<boolean> {
-  if (!userId) return false;
-  const userDocRef = doc(db, 'users', userId);
-  const docSnap = await getDoc(userDocRef);
-  if (docSnap.exists()) {
-    const userData = docSnap.data();
-    return userData.favoriteRecipes?.some((r: any) => r.slug === recipeSlug) || false;
-  }
-  return false;
-}
 
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipeName = unslugify(params.slug);
   const recipeDetails = await getRecipeDetails({ recipeName });
-
-  const auth = getAuth(app);
-  const user = auth.currentUser;
-  
-  const isFavorite = await getIsFavorite(user?.uid || null, params.slug);
-
+  const image = await generateRecipeImage({ recipeName });
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
@@ -48,16 +30,14 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
                 Back to recipes
               </Button>
             </Link>
-            <FavoriteButton recipeName={recipeName} recipeSlug={params.slug} isInitiallyFavorite={isFavorite} />
         </div>
         <Card className="overflow-hidden shadow-xl">
           <div className="relative aspect-[16/9] w-full bg-muted">
             <Image
-              src="https://placehold.co/800x450.png"
+              src={image.imageUrl}
               alt={recipeName}
               fill
               className="object-cover"
-              data-ai-hint="recipe food"
             />
           </div>
           <CardHeader className="p-6 md:p-8">

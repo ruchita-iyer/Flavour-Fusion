@@ -1,15 +1,16 @@
 'use client';
 
-import { useActionState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
 import { getRecipeSuggestions } from '@/app/actions';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
 import RecipeList from './RecipeList';
+import { useFormStatus } from 'react-dom';
 
 const initialState = {
   message: null,
@@ -37,7 +38,8 @@ function SubmitButton() {
 }
 
 export default function RecipeGenerator() {
-  const [state, formAction] = React.useActionState(getRecipeSuggestions, initialState);
+  const [state, formAction] = useActionState(getRecipeSuggestions, initialState);
+  const [recipes, setRecipes] = useState<string[]>([]);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -50,7 +52,10 @@ export default function RecipeGenerator() {
       });
     }
     if (state.recipes && state.recipes.length > 0 && !state.error) {
+      setRecipes(state.recipes);
       formRef.current?.reset();
+    } else if (state.error) {
+      setRecipes([]);
     }
   }, [state, toast]);
 
@@ -71,7 +76,7 @@ export default function RecipeGenerator() {
                 </form>
             </CardContent>
         </Card>
-        <RecipeList recipes={state.recipes || []} />
+        <RecipeList recipes={recipes} />
     </div>
   );
 }
