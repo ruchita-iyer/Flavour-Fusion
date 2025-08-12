@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react-dom';
 import { getRecipeSuggestions } from '@/app/actions';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -9,6 +9,7 @@ import { Loader2, Wand2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import React from 'react';
 
 const initialState = {
   message: null,
@@ -36,7 +37,7 @@ function SubmitButton() {
 }
 
 export default function RecipeGenerator() {
-  const [state, formAction] = useFormState(getRecipeSuggestions, initialState);
+  const [state, formAction] = React.useActionState(getRecipeSuggestions, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
