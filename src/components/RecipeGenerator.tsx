@@ -9,6 +9,7 @@ import { Card, CardContent } from './ui/card';
 import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
+import RecipeList from './RecipeList';
 
 const initialState = {
   message: null,
@@ -35,7 +36,7 @@ function SubmitButton() {
   );
 }
 
-export default function RecipeGenerator({ children }: { children: React.ReactNode }) {
+export default function RecipeGenerator() {
   const [state, formAction] = React.useActionState(getRecipeSuggestions, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -70,9 +71,7 @@ export default function RecipeGenerator({ children }: { children: React.ReactNod
                 </form>
             </CardContent>
         </Card>
-        {React.Children.map(children, (child) => 
-            React.cloneElement(child as React.ReactElement, { recipes: state.recipes })
-        )}
+        <RecipeList recipes={state.recipes || []} />
     </div>
   );
 }
