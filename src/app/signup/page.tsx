@@ -11,7 +11,6 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
 
 const initialState = {
   message: null,
@@ -41,28 +40,17 @@ export default function SignupPage() {
   const [state, formAction] = useActionState(signup, initialState);
   const { toast } = useToast();
   const router = useRouter();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      router.push('/');
-    }
-  }, [user, router]);
   
   useEffect(() => {
     if (state.message) {
-        if(state.error) {
-            toast({
-                variant: 'destructive',
-                title: 'Sign Up Failed',
-                description: state.message,
-            });
-        } else {
-            toast({
-                title: 'Success!',
-                description: state.message,
-            });
-        }
+      toast({
+          variant: state.error ? 'destructive': 'default',
+          title: state.error ? 'Sign Up Failed' : 'Success!',
+          description: state.message,
+      });
+    }
+    if (state.success) {
+      router.push('/');
     }
   }, [state, toast, router]);
 

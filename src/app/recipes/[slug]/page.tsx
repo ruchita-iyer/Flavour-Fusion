@@ -4,6 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FavoriteButton } from '@/components/FavoriteButton';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { headers } from 'next/headers';
+import { getInitialAuth } from 'next-firebase-auth-edge/lib/next/tokens';
 
 function unslugify(slug: string) {
     const words = slug.split('-');
@@ -12,20 +17,40 @@ function unslugify(slug: string) {
         .join(' ');
 }
 
+async function getIsFavorite(userId: string | null, recipeSlug: string): Promise<boolean> {
+  if (!userId) return false;
+  const userDocRef = doc(db, 'users', userId);
+  const docSnap = await getDoc(userDocRef);
+  if (docSnap.exists()) {
+    const userData = docSnap.data();
+    return userData.favoriteRecipes?.some((r: any) => r.slug === recipeSlug) || false;
+  }
+  return false;
+}
+
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipeName = unslugify(params.slug);
-
   const recipeDetails = await getRecipeDetails({ recipeName });
+
+  // This is a workaround to get the user on the server
+  const a = headers();
+  const user = auth.currentUser;
+  
+  const isFavorite = await getIsFavorite(user?.uid || null, params.slug);
+
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
       <div className="max-w-4xl mx-auto">
-        <Link href="/" className="mb-8 inline-flex items-center">
-          <Button variant="ghost">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to recipes
-          </Button>
-        </Link>
+        <div className="flex justify-between items-center mb-8">
+            <Link href="/" className="inline-flex items-center">
+              <Button variant="ghost">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to recipes
+              </Button>
+            </Link>
+            <FavoriteButton recipeName={recipeName} recipeSlug={params.slug} isInitiallyFavorite={isFavorite} />
+        </div>
         <Card className="overflow-hidden shadow-xl">
           <div className="relative aspect-[16/9] w-full bg-muted">
             <Image

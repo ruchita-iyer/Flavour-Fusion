@@ -2,8 +2,10 @@
 
 import { suggestRecipes, SuggestRecipesInput, SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { z } from 'zod';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc, getDoc, arrayUnion, arrayRemove, updateDoc } from "firebase/firestore";
+import { revalidatePath } from 'next/cache';
 
 const FormSchema = z.object({
   ingredients: z.string().min(3, 'Please enter at least one ingredient.'),
@@ -56,6 +58,7 @@ const LoginSchema = z.object({
 interface AuthState {
   message?: string | null;
   error?: boolean;
+  success?: boolean;
 }
 
 export async function login(prevState: AuthState, formData: FormData): Promise<AuthState> {
@@ -71,7 +74,7 @@ export async function login(prevState: AuthState, formData: FormData): Promise<A
 
   try {
     await signInWithEmailAndPassword(auth, validatedFields.data.email, validatedFields.data.password);
-    return { message: 'Logged in successfully!', error: false };
+    return { message: 'Logged in successfully!', success: true };
   } catch (e: any) {
     return { message: e.message, error: true };
   }
@@ -89,9 +92,59 @@ export async function signup(prevState: AuthState, formData: FormData): Promise<
   }
 
   try {
-    await createUserWithEmailAndPassword(auth, validatedFields.data.email, validatedFields.data.password);
-    return { message: 'Signed up successfully!', error: false };
+    const userCredential = await createUserWithEmailAndPassword(auth, validatedFields.data.email, validatedFields.data.password);
+    // Create a user document in Firestore
+    await setDoc(doc(db, "users", userCredential.user.uid), {
+        email: userCredential.user.email,
+        favoriteRecipes: []
+    });
+    return { message: 'Signed up successfully!', success: true };
   } catch (e: any) {
     return { message: e.message, error: true };
+  }
+}
+
+export async function toggleFavoriteRecipe(userId: string, recipeName: string, recipeSlug: string) {
+  const userDocRef = doc(db, 'users', userId);
+  try {
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      const isFavorite = userData.favoriteRecipes.some((r: any) => r.slug === recipeSlug);
+
+      if (isFavorite) {
+        // Remove from favorites
+        await updateDoc(userDocRef, {
+          favoriteRecipes: arrayRemove({ name: recipeName, slug: recipeSlug })
+        });
+      } else {
+        // Add to favorites
+        await updateDoc(userDocRef, {
+          favoriteRecipes: arrayUnion({ name: recipeName, slug: recipeSlug })
+        });
+      }
+      revalidatePath(`/recipes/${recipeSlug}`);
+      revalidatePath('/my-recipes');
+      return { success: true, isFavorite: !isFavorite };
+    } else {
+      return { success: false, message: "User not found" };
+    }
+  } catch (error) {
+    console.error("Error toggling favorite recipe:", error);
+    return { success: false, message: "An unexpected error occurred." };
+  }
+}
+
+export async function getUserFavoriteRecipes(userId: string): Promise<{name: string, slug: string}[]> {
+  const userDocRef = doc(db, 'users', userId);
+  try {
+    const docSnap = await getDoc(userDocRef);
+    if (docSnap.exists()) {
+      return docSnap.data().favoriteRecipes || [];
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching favorite recipes:", error);
+    return [];
   }
 }

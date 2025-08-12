@@ -11,7 +11,6 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/hooks/use-auth';
 
 const initialState = {
   message: null,
@@ -41,30 +40,19 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(login, initialState);
   const { toast } = useToast();
   const router = useRouter();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      router.push('/');
-    }
-  }, [user, router]);
 
   useEffect(() => {
     if (state.message) {
-      if(state.error) {
-        toast({
-            variant: 'destructive',
-            title: 'Login Failed',
-            description: state.message,
-        });
-      } else {
-        toast({
-            title: 'Success!',
-            description: state.message,
-        });
-      }
+      toast({
+        variant: state.error ? 'destructive' : 'default',
+        title: state.error ? 'Login Failed' : 'Success!',
+        description: state.message,
+      });
     }
-  }, [state, toast]);
+    if (state.success) {
+      router.push('/');
+    }
+  }, [state, toast, router]);
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-24 flex justify-center items-center">

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { UtensilsCrossed, User, LogOut } from 'lucide-react';
+import { UtensilsCrossed, User, LogOut, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { auth } from '@/lib/firebase';
@@ -51,6 +51,13 @@ export default function Header() {
                             </p>
                           </div>
                         </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild className="cursor-pointer">
+                            <Link href="/my-recipes">
+                                <Heart className="mr-2 h-4 w-4" />
+                                <span>My Recipes</span>
+                            </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                             <LogOut className="mr-2 h-4 w-4" />
