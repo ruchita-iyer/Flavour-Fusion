@@ -7,7 +7,7 @@ import { Button } from './ui/button';
 import { useAuth } from '@/hooks/use-auth';
 import { toggleFavoriteRecipe } from '@/app/actions';
 import { cn } from '@/lib/utils';
-import { useToast } from './use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 interface FavoriteButtonProps {
