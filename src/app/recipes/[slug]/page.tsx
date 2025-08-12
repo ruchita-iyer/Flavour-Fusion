@@ -1,3 +1,4 @@
+import { getRecipeDetails } from '@/ai/flows/get-recipe-details';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ChefHat } from 'lucide-react';
@@ -11,9 +12,11 @@ function unslugify(slug: string) {
         .join(' ');
 }
 
-export default function RecipeDetailPage({ params }: { params: { slug: string } }) {
+export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipeName = unslugify(params.slug);
   const dataAiHint = recipeName.split(' ').slice(0, 2).join(' ').toLowerCase();
+
+  const recipeDetails = await getRecipeDetails({ recipeName });
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
@@ -46,25 +49,19 @@ export default function RecipeDetailPage({ params }: { params: { slug: string } 
                 <div className="md:col-span-1">
                     <h3 className="text-xl font-bold font-headline mb-4">Ingredients</h3>
                     <ul className="space-y-2 text-foreground/80 list-disc list-inside">
-                        <li>4 large eggs</li>
-                        <li>2 tbsp milk</li>
-                        <li>1 tbsp butter</li>
-                        <li>Salt and pepper to taste</li>
-                        <li>Optional: chives, cheese</li>
-                        <li>... and other things</li>
+                        {recipeDetails.ingredients.map((ingredient, i) => (
+                            <li key={i}>{ingredient}</li>
+                        ))}
                     </ul>
                 </div>
                 <div className="md:col-span-2">
                     <h3 className="text-xl font-bold font-headline mb-4">Instructions</h3>
                     <div className="space-y-4 text-foreground/90">
-                        <p>This is a placeholder for the recipe instructions. A real recipe would have detailed steps on how to prepare and cook this dish.</p>
-                        <ol className="list-decimal list-inside space-y-2">
-                            <li>First, you do something with the ingredients. It is a very important step.</li>
-                            <li>Then, combine them in a specific way. Don't mess this up.</li>
-                            <li>After that, apply heat or cold, depending on the recipe. This is where the magic happens.</li>
-                            <li>Finally, serve and enjoy your delicious creation! You've earned it.</li>
+                        <ol className="list-decimal list-inside space-y-3">
+                           {recipeDetails.instructions.map((instruction, i) => (
+                                <li key={i}>{instruction}</li>
+                           ))}
                         </ol>
-                        <p>Remember to adjust seasonings to your liking and consult a real chef for actual cooking advice.</p>
                     </div>
                 </div>
             </div>
