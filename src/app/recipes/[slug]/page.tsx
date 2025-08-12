@@ -5,10 +5,10 @@ import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FavoriteButton } from '@/components/FavoriteButton';
-import { auth, db } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
-import { headers } from 'next/headers';
-import { getInitialAuth } from 'next-firebase-auth-edge/lib/next/tokens';
+import { getAuth } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 
 function unslugify(slug: string) {
     const words = slug.split('-');
@@ -32,8 +32,7 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
   const recipeName = unslugify(params.slug);
   const recipeDetails = await getRecipeDetails({ recipeName });
 
-  // This is a workaround to get the user on the server
-  const a = headers();
+  const auth = getAuth(app);
   const user = auth.currentUser;
   
   const isFavorite = await getIsFavorite(user?.uid || null, params.slug);

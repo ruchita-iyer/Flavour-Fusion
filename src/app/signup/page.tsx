@@ -15,6 +15,7 @@ import Link from 'next/link';
 const initialState = {
   message: null,
   error: false,
+  success: false,
 };
 
 function SubmitButton() {
