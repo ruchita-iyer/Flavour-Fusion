@@ -8,7 +8,7 @@ export default function Header() {
       <div className="container mx-auto flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <UtensilsCrossed className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold font-headline text-foreground">Recipe Browser</h1>
+          <h1 className="text-xl font-bold font-headline text-foreground">Flavour Fusion</h1>
         </Link>
       </div>
     </header>

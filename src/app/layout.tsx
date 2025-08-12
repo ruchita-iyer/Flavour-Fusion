@@ -6,7 +6,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
 export const metadata: Metadata = {
-  title: 'Recipe Browser',
+  title: 'Flavour Fusion',
   description: 'Find recipes based on the ingredients you have.',
 };
 
