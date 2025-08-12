@@ -23,6 +23,7 @@ async function RecipeImage({ recipeName }: { recipeName: string }) {
       alt={recipeName}
       fill
       className="object-cover"
+      data-ai-hint="recipe food"
     />
   );
 }

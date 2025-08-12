@@ -4,12 +4,12 @@ import { useActionState, useFormStatus } from 'react-dom';
 import { getRecipeSuggestions } from '@/app/actions';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import RecipeList from './RecipeList';
 import { Loader2, Wand2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
+import RecipeList from './RecipeList';
 
 const initialState = {
   message: null,
