@@ -3,6 +3,9 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
+import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
+import { Skeleton } from './ui/skeleton';
+import { Suspense } from 'react';
 
 interface RecipeCardProps {
   recipeName: string;
@@ -19,21 +22,28 @@ function slugify(text: string) {
     .replace(/-+$/, '');
 }
 
+async function RecipeImage({ recipeName }: { recipeName: string }) {
+  const { imageUrl } = await generateRecipeImage({ recipeName });
+  return (
+    <Image
+      src={imageUrl}
+      alt={recipeName}
+      fill
+      className="object-cover"
+    />
+  );
+}
+
 export default function RecipeCard({ recipeName }: RecipeCardProps) {
   const slug = slugify(recipeName);
-  const dataAiHint = recipeName.split(' ').slice(0, 2).join(' ').toLowerCase();
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1 duration-300 ease-in-out">
       <CardHeader className="p-0">
         <div className="aspect-video relative">
-          <Image
-            src={`https://placehold.co/600x400.png`}
-            alt={recipeName}
-            fill
-            className="object-cover"
-            data-ai-hint={dataAiHint}
-          />
+          <Suspense fallback={<Skeleton className="h-full w-full" />}>
+            <RecipeImage recipeName={recipeName} />
+          </Suspense>
         </div>
       </CardHeader>
       <CardContent className="p-4 flex flex-col flex-grow">
