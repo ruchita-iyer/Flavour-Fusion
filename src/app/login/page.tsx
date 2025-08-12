@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 const initialState = {
   message: null,
@@ -40,6 +41,13 @@ export default function LoginPage() {
   const [state, formAction] = useActionState(login, initialState);
   const { toast } = useToast();
   const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
 
   useEffect(() => {
     if (state.message) {
@@ -54,10 +62,9 @@ export default function LoginPage() {
             title: 'Success!',
             description: state.message,
         });
-        router.push('/');
       }
     }
-  }, [state, toast, router]);
+  }, [state, toast]);
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-24 flex justify-center items-center">
