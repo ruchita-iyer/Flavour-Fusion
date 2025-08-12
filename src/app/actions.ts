@@ -2,6 +2,8 @@
 
 import { suggestRecipes, SuggestRecipesInput, SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { z } from 'zod';
+import { auth } from '@/lib/firebase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
 const FormSchema = z.object({
   ingredients: z.string().min(3, 'Please enter at least one ingredient.'),
@@ -43,5 +45,53 @@ export async function getRecipeSuggestions(prevState: RecipeSuggestionState, for
   } catch (e) {
     console.error(e);
     return { message: 'An unexpected error occurred. Please try again.', error: true };
+  }
+}
+
+const LoginSchema = z.object({
+  email: z.string().email('Please enter a valid email.'),
+  password: z.string().min(6, 'Password must be at least 6 characters.'),
+});
+
+interface AuthState {
+  message?: string | null;
+  error?: boolean;
+}
+
+export async function login(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const validatedFields = LoginSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validatedFields.success) {
+    const errors = validatedFields.error.flatten().fieldErrors;
+    return {
+      message: errors.email?.[0] || errors.password?.[0] || 'Invalid input.',
+      error: true,
+    };
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, validatedFields.data.email, validatedFields.data.password);
+    return { message: 'Logged in successfully!', error: false };
+  } catch (e: any) {
+    return { message: e.message, error: true };
+  }
+}
+
+export async function signup(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const validatedFields = LoginSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validatedFields.success) {
+    const errors = validatedFields.error.flatten().fieldErrors;
+    return {
+      message: errors.email?.[0] || errors.password?.[0] || 'Invalid input.',
+      error: true,
+    };
+  }
+
+  try {
+    await createUserWithEmailAndPassword(auth, validatedFields.data.email, validatedFields.data.password);
+    return { message: 'Signed up successfully!', error: false };
+  } catch (e: any) {
+    return { message: e.message, error: true };
   }
 }

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { AuthProvider } from '@/components/AuthProvider';
 
 export const metadata: Metadata = {
   title: 'Recipe Browser',
@@ -23,12 +24,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,700;1,7..72,400&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn("min-h-screen bg-background font-body antialiased flex flex-col")}>
-        <Header />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
-        <Toaster />
+        <AuthProvider>
+          <Header />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
