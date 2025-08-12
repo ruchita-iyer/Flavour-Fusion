@@ -1,4 +1,5 @@
 import RecipeGenerator from "@/components/RecipeGenerator";
+import RecipeList from "@/components/RecipeList";
 import { ChefHat } from "lucide-react";
 
 export default function Home() {
@@ -16,7 +17,9 @@ export default function Home() {
         </p>
       </div>
       <div className="mt-12">
-        <RecipeGenerator />
+        <RecipeGenerator>
+            <RecipeList recipes={[]} />
+        </RecipeGenerator>
       </div>
     </div>
   );

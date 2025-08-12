@@ -6,10 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2 } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import React from 'react';
-import RecipeList from './RecipeList';
 
 const initialState = {
   message: null,
@@ -36,7 +35,7 @@ function SubmitButton() {
   );
 }
 
-export default function RecipeGenerator() {
+export default function RecipeGenerator({ children }: { children: React.ReactNode }) {
   const [state, formAction] = React.useActionState(getRecipeSuggestions, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -55,27 +54,25 @@ export default function RecipeGenerator() {
   }, [state, toast]);
 
   return (
-    <Card className="max-w-3xl mx-auto shadow-lg">
-      <CardContent className="p-6 md:p-8">
-        <form ref={formRef} action={formAction} className="space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <Input
-              name="ingredients"
-              placeholder="e.g., chicken, broccoli, garlic"
-              required
-              className="flex-grow text-base"
-            />
-            <SubmitButton />
-          </div>
-        </form>
-
-        {state.recipes && state.recipes.length > 0 && (
-          <div className="mt-12">
-            <h2 className="text-2xl font-bold font-headline mb-4">Your Recipe Ideas</h2>
-            <RecipeList recipes={state.recipes} />
-          </div>
+    <div>
+        <Card className="max-w-3xl mx-auto shadow-lg">
+            <CardContent className="p-6 md:p-8">
+                <form ref={formRef} action={formAction} className="space-y-4">
+                <div className="flex flex-col md:flex-row gap-4">
+                    <Input
+                    name="ingredients"
+                    placeholder="e.g., chicken, broccoli, garlic"
+                    required
+                    className="flex-grow text-base"
+                    />
+                    <SubmitButton />
+                </div>
+                </form>
+            </CardContent>
+        </Card>
+        {React.Children.map(children, (child) => 
+            React.cloneElement(child as React.ReactElement, { recipes: state.recipes })
         )}
-      </CardContent>
-    </Card>
+    </div>
   );
 }

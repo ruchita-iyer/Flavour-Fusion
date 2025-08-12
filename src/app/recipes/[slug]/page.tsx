@@ -1,31 +1,15 @@
 import { getRecipeDetails } from '@/ai/flows/get-recipe-details';
-import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Suspense } from 'react';
 
 function unslugify(slug: string) {
     const words = slug.split('-');
     return words
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
-}
-
-async function RecipeImage({ recipeName }: { recipeName: string }) {
-  const { imageUrl } = await generateRecipeImage({ recipeName });
-  return (
-    <Image
-      src={imageUrl}
-      alt={recipeName}
-      fill
-      className="object-cover"
-      data-ai-hint="recipe food"
-    />
-  );
 }
 
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
@@ -43,10 +27,14 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
           </Button>
         </Link>
         <Card className="overflow-hidden shadow-xl">
-          <div className="relative aspect-[16/9] w-full">
-            <Suspense fallback={<Skeleton className="h-full w-full" />}>
-                <RecipeImage recipeName={recipeName} />
-            </Suspense>
+          <div className="relative aspect-[16/9] w-full bg-muted">
+            <Image
+              src="https://placehold.co/800x450.png"
+              alt={recipeName}
+              fill
+              className="object-cover"
+              data-ai-hint="recipe food"
+            />
           </div>
           <CardHeader className="p-6 md:p-8">
             <div className="flex items-center gap-3 mb-2">
