@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
 
 
 function unslugify(slug: string) {
@@ -18,7 +17,6 @@ function unslugify(slug: string) {
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipeName = unslugify(params.slug);
   const recipeDetails = await getRecipeDetails({ recipeName });
-  const image = await generateRecipeImage({ recipeName });
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
@@ -34,10 +32,11 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
         <Card className="overflow-hidden shadow-xl">
           <div className="relative aspect-[16/9] w-full bg-muted">
             <Image
-              src={image.imageUrl}
+              src="https://placehold.co/600x400.png"
               alt={recipeName}
               fill
               className="object-cover"
+              data-ai-hint="recipe food"
             />
           </div>
           <CardHeader className="p-6 md:p-8">
