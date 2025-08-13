@@ -1,5 +1,3 @@
-// This file holds the Genkit flow for suggesting recipes based on user-provided ingredients.
-
 'use server';
 
 /**
