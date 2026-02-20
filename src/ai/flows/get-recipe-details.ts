@@ -28,6 +28,7 @@ export async function getRecipeDetails(input: RecipeDetailsInput): Promise<Recip
 
 const prompt = ai.definePrompt({
   name: 'getRecipeDetailsPrompt',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: RecipeDetailsInputSchema},
   output: {schema: RecipeDetailsOutputSchema},
   prompt: `You are an expert chef. A user wants to know how to make a "{{recipeName}}". Provide a list of ingredients and step-by-step instructions for this recipe.`,
