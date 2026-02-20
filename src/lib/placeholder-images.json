@@ -1,0 +1,12 @@
+{
+  "recipeCard": {
+    "url": "https://picsum.photos/seed/{seed}/400/225",
+    "width": 400,
+    "height": 225
+  },
+  "recipeDetail": {
+    "url": "https://picsum.photos/seed/{seed}/600/400",
+    "width": 600,
+    "height": 400
+  }
+}

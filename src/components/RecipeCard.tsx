@@ -3,9 +3,11 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
+import placeholderImages from '@/lib/placeholder-images.json';
 
 interface RecipeCardProps {
   recipeName: string;
+  index: number;
 }
 
 function slugify(text: string) {
@@ -19,15 +21,16 @@ function slugify(text: string) {
     .replace(/-+$/, '');
 }
 
-export default function RecipeCard({ recipeName }: RecipeCardProps) {
+export default function RecipeCard({ recipeName, index }: RecipeCardProps) {
   const slug = slugify(recipeName);
+  const imageUrl = placeholderImages.recipeCard.url.replace('{seed}', String(index + 1));
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1 duration-300 ease-in-out">
       <CardHeader className="p-0">
         <div className="aspect-video relative bg-muted">
           <Image
-            src="https://placehold.co/400x225.png"
+            src={imageUrl}
             alt={recipeName}
             fill
             className="object-cover"

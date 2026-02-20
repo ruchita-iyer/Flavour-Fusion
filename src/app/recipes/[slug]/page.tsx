@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import placeholderImages from '@/lib/placeholder-images.json';
 
 
 function unslugify(slug: string) {
@@ -17,6 +18,9 @@ function unslugify(slug: string) {
 export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
   const recipeName = unslugify(params.slug);
   const recipeDetails = await getRecipeDetails({ recipeName });
+  const seed = params.slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const imageUrl = placeholderImages.recipeDetail.url.replace('{seed}', String(seed));
+
 
   return (
     <div className="container mx-auto px-4 py-12 md:py-16">
@@ -32,7 +36,7 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
         <Card className="overflow-hidden shadow-xl">
           <div className="relative aspect-[16/9] w-full bg-muted">
             <Image
-              src="https://placehold.co/600x400.png"
+              src={imageUrl}
               alt={recipeName}
               fill
               className="object-cover"

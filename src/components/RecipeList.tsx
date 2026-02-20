@@ -14,7 +14,7 @@ export default function RecipeList({ recipes }: RecipeListProps) {
             <h2 className="text-2xl font-bold font-headline mb-4">Your Recipe Ideas</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {recipes.map((recipe, index) => (
-                <RecipeCard key={index} recipeName={recipe} />
+                <RecipeCard key={index} recipeName={recipe} index={index} />
             ))}
             </div>
       </div>
