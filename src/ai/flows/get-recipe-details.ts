@@ -34,6 +34,8 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert chef. A user wants to know how to make a "{{recipeName}}". Provide a list of ingredients and step-by-step instructions for this recipe.`,
 });
 
+import { executeWithFallback } from '../fallback';
+
 const getRecipeDetailsFlow = ai.defineFlow(
   {
     name: 'getRecipeDetailsFlow',
@@ -41,7 +43,6 @@ const getRecipeDetailsFlow = ai.defineFlow(
     outputSchema: RecipeDetailsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    return executeWithFallback<RecipeDetailsInput, RecipeDetailsOutput>(prompt, input);
   }
 );

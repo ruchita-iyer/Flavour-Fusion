@@ -11,11 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 import React from 'react';
 import RecipeList from './RecipeList';
 import { useFormStatus } from 'react-dom';
+import RateLimitDialog from './RateLimitDialog';
 
 const initialState = {
   message: null,
   recipes: [],
   error: false,
+  rateLimit: false,
 };
 
 function SubmitButton() {
@@ -40,17 +42,21 @@ function SubmitButton() {
 export default function RecipeGenerator() {
   const [state, formAction] = useActionState(getRecipeSuggestions, initialState);
   const [recipes, setRecipes] = useState<string[]>([]);
+  const [isRateLimitOpen, setIsRateLimitOpen] = useState(false);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state.message && state.error) {
+    if (state.rateLimit) {
+      setIsRateLimitOpen(true);
+    } else if (state.message && state.error) {
       toast({
         variant: "destructive",
         title: "Oh no! Something went wrong.",
         description: state.message,
       });
     }
+    
     if (state.recipes && state.recipes.length > 0 && !state.error) {
       setRecipes(state.recipes);
       formRef.current?.reset();
@@ -77,6 +83,7 @@ export default function RecipeGenerator() {
             </CardContent>
         </Card>
         <RecipeList recipes={recipes} />
+        <RateLimitDialog open={isRateLimitOpen} onOpenChange={setIsRateLimitOpen} errorType={state.errorType} />
     </div>
   );
 }

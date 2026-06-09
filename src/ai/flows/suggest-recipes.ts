@@ -43,6 +43,8 @@ const prompt = ai.definePrompt({
   Respond with a list of suggested recipe names.`,
 });
 
+import { executeWithFallback } from '../fallback';
+
 const suggestRecipesFlow = ai.defineFlow(
   {
     name: 'suggestRecipesFlow',
@@ -50,7 +52,6 @@ const suggestRecipesFlow = ai.defineFlow(
     outputSchema: SuggestRecipesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    return executeWithFallback<SuggestRecipesInput, SuggestRecipesOutput>(prompt, input);
   }
 );

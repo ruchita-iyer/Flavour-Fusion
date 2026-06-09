@@ -5,6 +5,7 @@ import { ArrowLeft, ChefHat } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import placeholderImages from '@/lib/placeholder-images.json';
+import ErrorFallback from '@/components/ErrorFallback';
 
 
 function unslugify(slug: string) {
@@ -18,7 +19,36 @@ function unslugify(slug: string) {
 export default async function RecipeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const recipeName = unslugify(slug);
-  const recipeDetails = await getRecipeDetails({ recipeName });
+  
+  let recipeDetails;
+  let isRateLimit = false;
+  let errorType: 'rate-limit' | 'unavailable' | undefined = undefined;
+  let isError = false;
+
+  try {
+    recipeDetails = await getRecipeDetails({ recipeName });
+  } catch (e: any) {
+    console.error("Error loading recipe details:", e);
+    isError = true;
+    const errMsg = e instanceof Error ? e.message : String(e);
+    const isQuota = errMsg.includes('429') || 
+                    errMsg.toLowerCase().includes('quota') || 
+                    errMsg.toLowerCase().includes('rate limit') || 
+                    errMsg.toLowerCase().includes('exhausted');
+    const isUnavailable = errMsg.includes('503') ||
+                          errMsg.toLowerCase().includes('service unavailable') ||
+                          errMsg.toLowerCase().includes('unavailable');
+
+    if (isQuota || isUnavailable) {
+      isRateLimit = true;
+      errorType = isUnavailable ? 'unavailable' : 'rate-limit';
+    }
+  }
+
+  if (isError || !recipeDetails) {
+    return <ErrorFallback isRateLimit={isRateLimit} errorType={errorType} recipeName={recipeName} />;
+  }
+
   const seed = slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const imageUrl = "/placeholder.png";
 
