@@ -15,11 +15,12 @@ function unslugify(slug: string) {
 }
 
 
-export default async function RecipeDetailPage({ params }: { params: { slug: string } }) {
-  const recipeName = unslugify(params.slug);
+export default async function RecipeDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const recipeName = unslugify(slug);
   const recipeDetails = await getRecipeDetails({ recipeName });
-  const seed = params.slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const imageUrl = placeholderImages.recipeDetail.url.replace('{seed}', String(seed));
+  const seed = slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const imageUrl = "/placeholder.png";
 
 
   return (
@@ -40,7 +41,6 @@ export default async function RecipeDetailPage({ params }: { params: { slug: str
               alt={recipeName}
               fill
               className="object-cover"
-              data-ai-hint="recipe food"
             />
           </div>
           <CardHeader className="p-6 md:p-8">

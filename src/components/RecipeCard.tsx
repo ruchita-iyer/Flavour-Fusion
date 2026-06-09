@@ -23,7 +23,7 @@ function slugify(text: string) {
 
 export default function RecipeCard({ recipeName, index }: RecipeCardProps) {
   const slug = slugify(recipeName);
-  const imageUrl = placeholderImages.recipeCard.url.replace('{seed}', String(index + 1));
+  const imageUrl = "/placeholder.png";
 
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-xl hover:-translate-y-1 duration-300 ease-in-out">
@@ -34,7 +34,6 @@ export default function RecipeCard({ recipeName, index }: RecipeCardProps) {
             alt={recipeName}
             fill
             className="object-cover"
-            data-ai-hint="recipe food"
           />
         </div>
       </CardHeader>
